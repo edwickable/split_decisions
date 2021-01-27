@@ -1,41 +1,59 @@
-# aux function that checks if word matches info
+def createEnglishWordsDict():
+	doc = open("/usr/share/dict/words", "r")
+	words = {}
+	for line in doc:
+			words[line.strip()] = True
+	
+	return words
+
+def promptUserInput():
+	shape1 = raw_input("first word: ")
+	shape2 = raw_input("second word: ")
+
+	if len(shape1) != len(shape2):
+		print("length mismatch")
+
+	return (shape1, shape2)
+
+def runSearch(shape1, shape2, words):
+	for word1 in words:
+		if doesWordFitShape(word1, shape1):
+			word2 = constructComplimentaryWord(word1, shape2)
+
+			if (word2 in words):
+				printSuccessMessage(word1, word2)
+
 # ex:
-# word="deer", info:"-ee-"
-def wordMatch(word, info):
-	if len(word) != len(info):
+# word="deer", shape:"-ee-"
+def doesWordFitShape(word, shape):
+	if len(word) != len(shape):
 		return False
-	for i in range(len(info)):
-		if info[i] != "-":
-			if info[i] != word[i]:
-				return False
+
+	for i in range(len(shape)):
+		blank = shape[i] == "-"
+
+		if not blank and shape[i] != word[i]:
+			return False
+
 	return True
 
-# creates dict as a dictionary of english words
-doc = open("/usr/share/dict/words", "r")
-dict = {}
-for line in doc: # fill dictionary
-    dict[line.strip()] = True
+def constructComplimentaryWord(word, shape):
+	compliment = ""
 
-# prompts user
-info1 = raw_input("first word: ")
-info2 = raw_input("second word: ")
+	for i in range(len(shape)):
+		if shape[i] == "-":
+			compliment += word[i]
+		else:
+			compliment += shape[i]
+	
+	return compliment
 
-# basic mistake check
-if len(info1) != len(info2):
-	print("length mismatch")
+def printSuccessMessage(word1, word2):
+	print("word 1: " + word1)
+	print("word 2: " + word2)
+	print("-----")
 
-# meat of the code:
-for word1 in dict:
-	if wordMatch(word1, info1): # found word1 that fits info1
-		# building word2 candidate from info 2
-		word2 = ""
-		for i in range(len(info2)):
-			if info2[i] != "-":
-				word2 = word2+info2[i]
-			else:
-				word2 = word2+word1[i]
-		if (word2 in dict):
-			# success!
-			print("word 1: "+word1)
-			print("word 2: "+word2)
+words = createEnglishWordsDict()
+shape1, shape2 = promptUserInput()
 
+runSearch(shape1, shape2, words)
